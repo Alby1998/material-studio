@@ -6,7 +6,7 @@ Load a model from ArchiCAD (or any GLB/FBX/OBJ/3DS), assign PBR materials to hun
 
 No install, no account, no backend. Everything runs client-side in the browser.
 
-**[▶ Live demo](https://albydc.github.io/material-studio/)** · Italiano / English
+**[▶ Live demo](https://alby1998.github.io/material-studio/)** · Italiano / English
 
 ---
 
@@ -46,7 +46,7 @@ It is deliberately **not** a renderer. It does not chase photorealism and does n
 `index.html` uses ES modules, so `file://` will not work — browsers block module loading over it, and IndexedDB needs a stable origin. Serve the folder over HTTP:
 
 ```bash
-git clone https://github.com/albydc/material-studio.git
+git clone https://github.com/alby1998/material-studio.git
 cd material-studio
 python -m http.server 8000
 ```
