@@ -985,8 +985,39 @@ function buildDemoScene(){
   add('Arredo_Divano',2.0,.75,.85,-2.0,0,1.8);
   return g;
 }
+/* Materiali di partenza della demo. Non e' solo estetica: senza assegnazioni la scena
+   e' tutta grigia, il brief .md esce con una sola voce e il grafico delle superfici per
+   materiale non mostra nulla. Assegnando per prefisso ArchiCAD si vede subito a cosa
+   serve il raggruppamento dell'outliner. */
+const DEMO_MATS=[
+  // key i18n           prefisso mesh   colore   metal rough opacity
+  ['demo.mat.plaster', ['Muro'],       '#e8e4dc', 0,   .92,  1],
+  ['demo.mat.screed',  ['Solaio'],     '#b9b2a6', 0,   .85,  1],
+  ['demo.mat.glass',   ['Serramento'], '#bcd4dc', 0,   .10, .28],
+  ['demo.mat.oak',     ['Arredo_Tavolo','Arredo_Gamba'], '#a9784b', 0, .55, 1],
+  ['demo.mat.lacquer', ['Arredo_Cucina'], '#3d4a52', .15, .35, 1],
+  ['demo.mat.fabric',  ['Arredo_Divano'], '#8a7f74', 0,  .95,  1]
+];
+function assignDemoMaterials(){
+  DEMO_MATS.forEach(([key,prefixes,color,metalness,roughness,opacity])=>{
+    const id=uid('m_');
+    P.materials[id]={name:T(key),color,metalness,roughness,opacity,
+                     ru:1,rv:1,normalScale:1,maps:{}};
+    meshes.forEach(o=>{
+      const n=o.name||'';
+      if(prefixes.some(pre=>n.startsWith(pre))) P.assign[o.userData.key]=id;
+    });
+  });
+  curMat=Object.keys(P.materials)[0]||null;
+  applyAll();
+}
 function loadDemoScene(){
   install(buildDemoScene(),T('demo.name'));
+  assignDemoMaterials();
+  /* una sezione gia' pronta: il brief .md e' la parte che distingue il tool,
+     ma richiede una selezione — cosi' e' esportabile al primo click. */
+  P.sections=[{name:T('demo.section'),keys:meshes.map(o=>o.userData.key)}];
+  refreshUI(); buildEditor(); buildTree(); buildSecList(); updateApplyBtn();
   toast(T('msg.demoLoaded'));
 }
 
