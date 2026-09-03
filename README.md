@@ -8,6 +8,8 @@ No install, no account, no backend. Everything runs client-side in the browser.
 
 **[▶ Live demo](https://alby1998.github.io/material-studio/)** · Italiano / English
 
+The demo opens on a small generated apartment — an 8×6 m room with walls, openings and furniture — so you can try the whole flow without supplying a model. Drop in your own GLB or FBX at any time to replace it.
+
 ---
 
 ## Why it exists

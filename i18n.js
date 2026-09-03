@@ -204,6 +204,8 @@ it:{
   'file.render':'render',
   'file.section':'sezione',
   'file.room':'Ambiente',
+  'demo.name':'Scena dimostrativa',
+  'msg.demoLoaded':'Scena dimostrativa — carica un tuo modello per iniziare',
   'file.viewsSuffix':'_viste.png',
   'file.briefSuffix':'_brief.md',
 
@@ -442,6 +444,8 @@ en:{
   'file.render':'render',
   'file.section':'section',
   'file.room':'Room',
+  'demo.name':'Demo scene',
+  'msg.demoLoaded':'Demo scene — load your own model to get started',
   'file.viewsSuffix':'_views.png',
   'file.briefSuffix':'_brief.md',
 

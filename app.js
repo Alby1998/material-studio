@@ -940,6 +940,56 @@ E('bLink').onclick=async()=>{
   }catch(e){}
 };
 
+/* ---------- scena demo ---------- */
+/* Generata via codice invece che distribuita come .glb: nessun problema di licenza
+   e nessun binario nel repo. Serve solo a far vedere il flusso completo (selezione ->
+   materiale -> sezione -> brief) a chi apre la demo online senza avere un modello proprio.
+   I nomi seguono la convenzione di un export ArchiCAD ("Muro_01", "Serramento_02"...):
+   e' cosi' che il raggruppamento per prefisso dell'outliner ha senso da mostrare. */
+function buildDemoScene(){
+  const g=new THREE.Group(); g.name='Demo';
+  const M=()=>new THREE.MeshStandardMaterial({color:0xcfcfcf,roughness:.9,metalness:0});
+  const add=(name,w,h,d,x,y,z)=>{
+    const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),M());
+    m.name=name; m.position.set(x,y+h/2,z); g.add(m); return m;
+  };
+  const W=8, D=6, H=2.9, t=.2;                 // stanza 8x6, altezza 2.9m
+
+  add('Solaio_01',W,t,D,0,-t,0);               // pavimento
+  add('Solaio_02',W,t,D,0,H,0);                // soffitto
+
+  /* perimetro: due muri pieni, due spezzati per lasciare le aperture */
+  add('Muro_01',W,H,t,0,0,-D/2);               // nord (pieno)
+  add('Muro_02',t,H,D,-W/2,0,0);               // ovest (pieno)
+  // sud: due tratti + fascia sopra la finestra
+  add('Muro_03',2.4,H,t,-2.8,0,D/2);
+  add('Muro_04',2.4,H,t,2.8,0,D/2);
+  add('Muro_05',3.2,.9,t,0,H-.9,D/2);          // fascia sopra la finestra: y 2.00..2.90
+  add('Muro_09',3.2,.9,t,0,0,D/2);             // parapetto sotto la finestra: y 0..0.90
+  // est: due tratti + fascia sopra la porta
+  add('Muro_06',t,H,1.9,W/2,0,-2.05);
+  add('Muro_07',t,H,1.9,W/2,0,2.05);
+  add('Muro_08',t,.8,2.2,W/2,H-.8,0);
+
+  /* aperture: pannelli sottili, cosi' si vede il senso di un materiale trasparente */
+  add('Serramento_01',3.2,1.1,.06,0,.9,D/2);   // finestra a sud: riempie il vano y 0.90..2.00
+  add('Serramento_02',.06,2.1,2.2,W/2,0,0);    // porta a est
+
+  /* arredo minimo: da' scala alla stanza e qualcosa su cui provare i materiali */
+  add('Arredo_Tavolo',1.8,.08,.9,-1.4,.74,-.6);
+  add('Arredo_Gamba_01',.08,.74,.08,-2.2,0,-1.0);
+  add('Arredo_Gamba_02',.08,.74,.08,-.6,0,-1.0);
+  add('Arredo_Gamba_03',.08,.74,.08,-2.2,0,-.2);
+  add('Arredo_Gamba_04',.08,.74,.08,-.6,0,-.2);
+  add('Arredo_Cucina',2.6,.9,.65,2.6,0,-D/2+.45);
+  add('Arredo_Divano',2.0,.75,.85,-2.0,0,1.8);
+  return g;
+}
+function loadDemoScene(){
+  install(buildDemoScene(),T('demo.name'));
+  toast(T('msg.demoLoaded'));
+}
+
 /* ripresa automatica all'avvio */
 (async()=>{
   try{
@@ -952,11 +1002,15 @@ E('bLink').onclick=async()=>{
     const a=await idbGet('__autosave');
     if(a&&(Object.keys(a.materials||{}).length||a.sections?.length)){
       loadProject(a); stat('stat.resumed','var(--accent)');
-    } else stat(location.protocol==='file:'?'stat.warnFile':'stat.ready');
+    } else {
+      stat(location.protocol==='file:'?'stat.warnFile':'stat.ready');
+      loadDemoScene();          // nessun lavoro salvato: parte la demo, non una scena vuota
+    }
     ready=true;
   }catch(e){
     idbOK=false;
     stat('stat.noMemory','var(--warn)');
+    loadDemoScene();            // IndexedDB non disponibile: niente da ripristinare comunque
     ready=true;
     if(location.protocol==='file:') setTimeout(()=>toast(T('msg.fileProtocol')),1500);
   }
