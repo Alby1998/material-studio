@@ -990,31 +990,6 @@ function loadDemoScene(){
   toast(T('msg.demoLoaded'));
 }
 
-/* ripresa automatica all'avvio */
-(async()=>{
-  try{
-    const h=await idbGet('__handle');
-    if(h&&h.queryPermission){
-      const p=await h.queryPermission({mode:'readwrite'});
-      if(p==='granted') fileHandle=h;
-      else if(p==='prompt') stat('stat.fileLinked','var(--warn)');
-    }
-    const a=await idbGet('__autosave');
-    if(a&&(Object.keys(a.materials||{}).length||a.sections?.length)){
-      loadProject(a); stat('stat.resumed','var(--accent)');
-    } else {
-      stat(location.protocol==='file:'?'stat.warnFile':'stat.ready');
-      loadDemoScene();          // nessun lavoro salvato: parte la demo, non una scena vuota
-    }
-    ready=true;
-  }catch(e){
-    idbOK=false;
-    stat('stat.noMemory','var(--warn)');
-    loadDemoScene();            // IndexedDB non disponibile: niente da ripristinare comunque
-    ready=true;
-    if(location.protocol==='file:') setTimeout(()=>toast(T('msg.fileProtocol')),1500);
-  }
-})();
 E('bSaveLocal').onclick=async()=>{
   const n=prompt(T('prompt.projName'),P.modelName||T('file.project')); if(!n)return;
   const db=await DB(); db.transaction('projects','readwrite').objectStore('projects').put(snapshot(),n);
@@ -1307,3 +1282,34 @@ for(const code in LANGS){
 langSel.value=lang;
 langSel.onchange=e=>{ if(setLang(e.target.value)) applyLang(); };
 applyLang();
+
+/* ---------- ripresa automatica all'avvio ---------- */
+/* Deve stare in fondo al file: e' l'unico percorso che chiama install() DURANTE la
+   valutazione dello script (i caricamenti da drag & drop avvengono dopo, a script gia'
+   valutato). Piu' in alto, install() -> baseOf (const arrow, definito sotto) finirebbe
+   in temporal dead zone: il ReferenceError verrebbe inghiottito dal catch qui sotto e
+   la scena demo non comparirebbe, senza alcun errore visibile. */
+(async()=>{
+  try{
+    const h=await idbGet('__handle');
+    if(h&&h.queryPermission){
+      const p=await h.queryPermission({mode:'readwrite'});
+      if(p==='granted') fileHandle=h;
+      else if(p==='prompt') stat('stat.fileLinked','var(--warn)');
+    }
+    const a=await idbGet('__autosave');
+    if(a&&(Object.keys(a.materials||{}).length||a.sections?.length)){
+      loadProject(a); stat('stat.resumed','var(--accent)');
+    } else {
+      stat(location.protocol==='file:'?'stat.warnFile':'stat.ready');
+      loadDemoScene();          // nessun lavoro salvato: parte la demo, non una scena vuota
+    }
+    ready=true;
+  }catch(e){
+    idbOK=false;
+    stat('stat.noMemory','var(--warn)');
+    loadDemoScene();            // IndexedDB non disponibile: niente da ripristinare comunque
+    ready=true;
+    if(location.protocol==='file:') setTimeout(()=>toast(T('msg.fileProtocol')),1500);
+  }
+})();
