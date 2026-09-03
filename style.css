@@ -1,0 +1,119 @@
+:root{
+  --bg:#12151a; --panel:#1a1f27; --panel-2:#212832; --line:#2c3542;
+  --txt:#dbe3ee; --dim:#8494a8; --accent:#6ee7b7; --accent-2:#38bdf8; --warn:#fbbf24;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);
+  font:13px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;overflow:hidden}
+#app{display:grid;grid-template-columns:260px 1fr 300px;grid-template-rows:44px 1fr;height:100%}
+header{grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:0 10px;
+  background:var(--panel);border-bottom:1px solid var(--line)}
+header .logo{font:600 12px/1 var(--mono);letter-spacing:.14em;color:var(--accent);margin-right:6px}
+header .sp{flex:1}
+header select{width:auto;cursor:pointer;padding:5px 6px;font-size:12px;margin-left:2px}
+button,select,input[type=text],input[type=number]{background:var(--panel-2);color:var(--txt);
+  border:1px solid var(--line);border-radius:4px;padding:5px 9px;font:inherit;cursor:pointer}
+button:hover{border-color:var(--accent-2)}
+/* focus da tastiera: :focus-visible non scatta sul click col mouse, quindi l'anello
+   compare solo navigando con Tab. Su .item/.grp-hdr l'outline e' interno (outline-offset
+   negativo) perche' le righe sono a filo del bordo del pannello. */
+:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px;border-radius:4px}
+.item:focus-visible,.grp-hdr:focus-visible,.matcard:focus-visible,.tex:focus-visible{outline-offset:-2px}
+input[type=range]:focus-visible{outline-offset:4px}
+button.pri{background:var(--accent);color:#0b2b20;border-color:transparent;font-weight:600}
+button.pend{background:var(--accent-2);color:#04222f}
+button.pri:hover{filter:brightness(1.1)}
+input[type=text],input[type=number],select{cursor:auto;width:100%}
+label.file{display:inline-block}
+label.file input{display:none}
+aside{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;padding:10px}
+#left{display:flex;flex-direction:column;overflow:hidden}
+#left #tree{flex:1 1 auto;overflow-y:auto;min-height:60px}
+#left .secpanel{flex:0 0 auto;padding-top:2px}
+#left .secpanel #seclist{max-height:26vh;overflow-y:auto}
+aside.right{border-right:0;border-left:1px solid var(--line)}
+#viewport{position:relative;background:#0d1014}
+#viewport canvas{display:block}
+#hud{position:absolute;left:10px;bottom:10px;font:11px/1.6 var(--mono);color:var(--dim);pointer-events:none}
+h2{display:flex;align-items:center;gap:6px;font:600 10px/1 var(--mono);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--dim);margin:14px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+h2 .tools{margin-left:auto;display:flex;gap:2px}
+h2 .tools button{padding:1px 6px;font-size:12px;line-height:1.5;color:var(--dim);background:none;border-color:transparent}
+h2 .tools button:hover{color:var(--txt);border-color:var(--line)}
+h2:first-child{margin-top:0}
+.row{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.row>span{flex:0 0 78px;color:var(--dim);font-size:11px}
+.list{display:flex;flex-direction:column;gap:1px}
+.item{display:flex;align-items:center;gap:7px;padding:5px 7px;border-radius:4px;cursor:pointer;
+  font:11px/1.3 var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item:hover{background:var(--panel-2)}
+.item.sel{background:#0f3a34;color:var(--accent)}
+.item.hid{opacity:.4;text-decoration:line-through}
+.item .eye{margin:0 1px 0 -2px;padding:0 4px;background:none;border:0;color:var(--dim);font-size:10px;flex:0 0 auto}
+.item .eye:hover{color:var(--accent-2)}
+.item:not(:hover) .eye{opacity:.35}
+.item.hid .eye{opacity:1;color:var(--accent-2)}
+.item .dot{width:9px;height:9px;border-radius:2px;flex:0 0 auto;border:1px solid #0006}
+.item .tag{margin-left:auto;color:var(--dim);font-size:10px}
+.grp-hdr{display:flex;align-items:center;gap:7px;padding:5px 7px;border-radius:4px;cursor:pointer;
+  font:600 11px/1.3 var(--mono);color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grp-hdr:hover{background:var(--panel-2)}
+.grp-hdr.sel{color:var(--accent)}
+.grp-hdr .chev{width:9px;flex:0 0 auto;font-size:9px}
+.grp-hdr .eye{margin:0 1px 0 -2px;padding:0 4px;background:none;border:0;color:var(--dim);font-size:10px;flex:0 0 auto}
+.grp-hdr .eye:hover{color:var(--accent-2)}
+.grp-hdr .gname{overflow:hidden;text-overflow:ellipsis}
+.grp-hdr .gcnt{margin-left:auto;color:var(--dim);font-size:10px;font-weight:400}
+.grp-body{display:flex;flex-direction:column;gap:1px;padding-left:15px}
+.matcard{display:flex;align-items:center;gap:8px;padding:6px;border:1px solid var(--line);
+  border-radius:5px;margin-bottom:5px;cursor:pointer}
+.matcard:hover{border-color:var(--accent-2)}
+.matcard.sel{border-color:var(--accent);background:#0f3a3455}
+.matcard .sw{width:30px;height:30px;border-radius:4px;flex:0 0 auto;background-size:cover;border:1px solid #0006}
+.matcard .nm{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.matcard .selUsers{color:var(--dim);font-size:10px;padding:2px 7px;border-radius:3px}
+.matcard .selUsers:hover{color:var(--accent-2);border-color:var(--accent-2)}
+.slot{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.slot .th{width:26px;height:26px;border-radius:3px;background:#0008 center/cover;border:1px solid var(--line);flex:0 0 auto}
+.slot .nmm{flex:0 0 58px;font-size:11px;color:var(--dim)}
+.slot select{flex:1;font-size:11px;padding:3px 5px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input[type=color]{width:34px;height:26px;padding:0;border:1px solid var(--line);border-radius:4px;background:none}
+.hint{color:var(--dim);font-size:11px;margin:6px 0}
+.badge{font:10px var(--mono);color:var(--warn)}
+#toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--panel-2);
+  border:1px solid var(--line);padding:8px 14px;border-radius:6px;opacity:0;transition:.25s;pointer-events:none;
+  display:flex;align-items:center;gap:10px;z-index:30}
+#toast.on{opacity:1}
+/* col bottone Annulla il toast deve essere cliccabile: pointer-events riattivati solo allora */
+#toast.act{pointer-events:auto}
+#toast .undo{background:none;border:1px solid var(--accent-2);color:var(--accent-2);
+  padding:2px 9px;border-radius:4px;font:11px var(--mono);flex:0 0 auto}
+#toast .undo:hover{background:var(--accent-2);color:#04222f}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}
+}
+#drop{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+  background:#0d1014e0;border:2px dashed var(--accent);font:600 14px var(--mono);color:var(--accent)}
+#drop.on{display:flex}
+#picker,.ovl{position:fixed;inset:0;background:#0a0d11e8;display:none;z-index:20;padding:34px;justify-content:center}
+#picker.on,.ovl.on{display:flex}
+#pkbox,.ovlbox{background:var(--panel);border:1px solid var(--line);border-radius:8px;width:min(780px,100%);
+  display:flex;flex-direction:column;overflow:hidden;max-height:100%}
+#pkhead,.ovlhead{display:flex;gap:8px;align-items:center;padding:10px;border-bottom:1px solid var(--line)}
+#pkhead input,.ovlhead input{flex:1}
+#matlist{overflow-y:auto;padding:10px}
+#curcard .matcard{padding:9px;border-width:2px}
+#curcard .matcard .sw{width:40px;height:40px}
+#curcard .matcard::after{content:'▸ cambia';margin-left:auto;color:var(--accent-2);font:10px var(--mono)}
+#pkgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px;padding:10px;overflow-y:auto}
+.tex{position:relative;border:1px solid var(--line);border-radius:5px;overflow:hidden;cursor:pointer;background:var(--panel-2)}
+.tex:hover{border-color:var(--accent)}
+.tex .im{height:82px;background:#0b0e12 center/cover}
+.tex .lb{font:10px/1.3 var(--mono);padding:4px 5px;color:var(--dim);word-break:break-all;height:32px;overflow:hidden}
+.tex .del{position:absolute;top:3px;right:3px;background:#000b;border:0;color:var(--txt);
+  padding:1px 6px;border-radius:3px;font-size:11px;display:none}
+.tex:hover .del{display:block}
+.slot .pick{flex:1;text-align:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:11px;padding:3px 6px}
+.slot .mini{padding:3px 6px;font-size:11px;color:var(--dim);flex:0 0 auto}

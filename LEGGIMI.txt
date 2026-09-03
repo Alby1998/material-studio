@@ -1,0 +1,36 @@
+MATERIAL STUDIO — struttura divisa
+====================================
+
+File:
+  index.html   struttura pagina + tutti i pannelli
+  style.css    aspetto grafico
+  app.js       logica: three.js, materiali, ambiente, sezioni, autosalvataggio
+  i18n.js      testi dell'interfaccia in italiano e inglese
+
+LINGUA
+  Il menu a tendina in alto a destra cambia la lingua (Italiano / English).
+  La scelta resta memorizzata e viene riapplicata alla riapertura.
+
+COME APRIRLO (obbligatorio per il salvataggio automatico)
+-----------------------------------------------------------
+Aprire index.html con doppio click NON basta: Chrome blocca la memoria
+locale sui file aperti da file://, quindi ogni modifica andrebbe persa
+ad ogni riavvio.
+
+1. Apri il Prompt dei comandi in questa cartella
+   (nella barra indirizzi di Esplora File scrivi "cmd" e premi Invio)
+2. Esegui:
+       python -m http.server 8000
+3. Apri nel browser:
+       http://localhost:8000/index.html
+
+Da qui in poi il lavoro si salva da solo. Il pulsante "Auto-salva su
+file" nell'intestazione collega anche un .json sul disco, se lo vuoi
+fuori dal browser.
+
+AGGIORNARE UNA VERSIONE FUTURA
+-----------------------------------------------------------
+Quando arriva una nuova versione, sostituisci solo il file che è
+cambiato (di solito app.js). index.html e style.css restano uguali
+a lungo. Il lavoro salvato nel browser o nel file collegato non
+viene toccato dalla sostituzione, perché vive fuori da questi file.

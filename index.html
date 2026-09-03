@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Material Studio — assegnazione materiali</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header>
+    <span class="logo">MATERIAL·STUDIO</span>
+    <label class="file"><input type="file" id="fModel" accept=".glb,.gltf,.fbx,.obj,.3ds"><button class="pri" data-i18n="hdr.load" onclick="this.parentNode.querySelector('input').click()">Carica modello</button></label>
+    <label class="file"><input type="file" id="fTex" accept="image/*,.tga" multiple><button data-i18n="hdr.addTex" onclick="this.parentNode.querySelector('input').click()">Aggiungi texture</button></label>
+    <span class="sp"></span>
+    <button id="bLink" data-i18n="hdr.link" data-i18n-title="hdr.link.t" title="Salvataggio automatico su un file .json del disco">Auto-salva su file</button>
+    <span id="savest" class="badge" style="font-size:10px;margin:0 4px"></span>
+    <button id="bSaveLocal" data-i18n="hdr.saveLocal">Salva nel browser</button>
+    <button id="bLoadLocal" data-i18n="hdr.openLocal">Apri salvato</button>
+    <label class="file"><input type="file" id="fProj" accept=".json"><button data-i18n="hdr.import" onclick="this.parentNode.querySelector('input').click()">Importa .json</button></label>
+    <button id="bExport" data-i18n="hdr.export">Esporta .json</button>
+    <button id="bShot" data-i18n="hdr.png">PNG</button>
+    <select id="lang" data-i18n-title="hdr.lang.t" title="Lingua dell’interfaccia"></select>
+  </header>
+
+  <aside id="left">
+    <h2><span data-i18n="left.objects">Oggetti</span> <span id="cnt" class="badge"></span>
+      <span class="tools"><button id="bExpAll" data-i18n-title="left.expAll.t" title="espandi tutti i gruppi">▾</button><button id="bColAll" data-i18n-title="left.colAll.t" title="comprimi tutti i gruppi">▸</button></span>
+    </h2>
+    <div class="row"><input type="text" id="filter" style="flex:1" data-i18n-ph="left.filter.ph" placeholder="filtra per nome…">
+      <label style="display:flex;gap:4px;align-items:center;color:var(--dim);font-size:10px;white-space:nowrap"><input type="checkbox" id="cVisOnly" style="width:auto"><span data-i18n="left.visOnly" data-i18n-title="left.visOnly.t" title="mostra solo le prop non nascoste">visibili</span></label>
+    </div>
+    <div class="row">
+      <button id="bSimili" style="flex:1" data-i18n="left.similar">Seleziona simili</button>
+      <button id="bAll" style="flex:1" data-i18n="left.all">Tutti</button>
+    </div>
+    <div class="row">
+      <button id="bHide" style="flex:1" data-i18n="left.hide" data-i18n-title="left.hide.t" title="Nascondi la selezione (H)">Nascondi</button>
+      <button id="bIso" style="flex:1" data-i18n="left.iso" data-i18n-title="left.iso.t" title="Mostra solo la selezione (I)">Isola</button>
+      <button id="bShowAll" style="flex:1" data-i18n="left.showAll" data-i18n-title="left.showAll.t" title="Mostra tutto (U)">Mostra tutto</button>
+    </div>
+    <div class="list" id="tree"></div>
+
+    <div class="secpanel">
+      <h2><span data-i18n="left.sections">Sezioni</span> <span id="seccnt" class="badge"></span></h2>
+      <div class="row"><button id="bSecNew" class="pri" style="flex:1" data-i18n="left.secNew">＋ Crea sezione da selezione</button></div>
+      <div id="seclist"></div>
+    </div>
+  </aside>
+
+  <div id="viewport">
+    <div id="hud"></div>
+    <div id="drop" data-i18n="vp.drop">rilascia qui il modello o le texture</div>
+  </div>
+
+  <aside class="right">
+    <h2><span data-i18n="r.selProp">Prop selezionata</span> <span id="selinfo" class="badge"></span></h2>
+    <div id="nosel" class="hint" data-i18n="r.noSel">Clicca una prop nella vista 3D o nell'elenco a sinistra.</div>
+
+    <div id="propbox" style="display:none">
+      <div class="hint" style="margin:0 0 5px" data-i18n="r.curMat">Materiale corrente — clicca per cambiarlo</div>
+      <div id="curcard"></div>
+
+      <div id="editor" style="display:none">
+        <h2><span data-i18n="r.props">Proprietà</span></h2>
+        <div class="row"><span data-i18n="r.name">Nome</span><input type="text" id="mName"></div>
+        <div class="row"><span data-i18n="r.color">Colore</span><input type="color" id="mColor"><input type="text" id="mHex" style="flex:1"></div>
+        <div class="row"><span data-i18n="r.metal">Metal</span><input type="range" id="mMetal" min="0" max="1" step="0.01"><b id="vMetal" style="width:30px;text-align:right;font:11px var(--mono)"></b></div>
+        <div class="row"><span data-i18n="r.rough">Rough</span><input type="range" id="mRough" min="0" max="1" step="0.01"><b id="vRough" style="width:30px;text-align:right;font:11px var(--mono)"></b></div>
+        <div class="row"><span data-i18n="r.opacity">Opacità</span><input type="range" id="mOpa" min="0" max="1" step="0.01"><b id="vOpa" style="width:30px;text-align:right;font:11px var(--mono)"></b></div>
+        <div class="row"><span data-i18n="r.tiling">Tiling U/V</span><input type="number" id="mRu" step="0.1" min="0.01"><input type="number" id="mRv" step="0.1" min="0.01"></div>
+        <div class="row"><span data-i18n="r.normal">Normal ×</span><input type="range" id="mNS" min="0" max="3" step="0.05"><b id="vNS" style="width:30px;text-align:right;font:11px var(--mono)"></b></div>
+
+        <h2><span data-i18n="r.maps">Mappe</span>
+          <span class="tools"><button id="bTexLib" data-i18n-title="r.texBtn.t" title="Libreria texture"><span data-i18n="r.texBtn">Texture</span> <span id="tcnt" class="badge"></span></button></span>
+        </h2>
+        <div id="slots"></div>
+        <button id="bRevert" style="width:100%;margin-top:8px;display:none" data-i18n="r.revert">Ripristina originale FBX</button>
+      </div>
+
+      <button id="bAssign" class="pri" style="width:100%;margin-top:8px" data-i18n="r.apply">Applica</button>
+    </div>
+
+    <h2><span data-i18n="env.title">Ambiente</span></h2>
+    <div class="row"><span data-i18n="env.preset">Preset</span><select id="preset">
+      <option value="studio" data-i18n="env.p.studio">Studio neutro</option>
+      <option value="giorno" data-i18n="env.p.giorno">Mezzogiorno</option>
+      <option value="velato" data-i18n="env.p.velato">Cielo coperto</option>
+      <option value="tramonto" data-i18n="env.p.tramonto">Tramonto</option>
+      <option value="hdri" data-i18n="env.p.hdri">HDRI da file…</option>
+    </select></div>
+    <div class="row" id="rowHdri" style="display:none">
+      <label class="file" style="flex:1"><input type="file" id="fHdri" accept=".hdr,.exr">
+        <button style="width:100%" data-i18n="env.loadHdr" onclick="this.parentNode.querySelector('input').click()">Carica .hdr</button></label>
+    </div>
+    <div class="row" id="rowRot" style="display:none"><span data-i18n="env.rotation">Rotazione</span><input type="range" id="envRot" min="0" max="360" step="1" value="0"></div>
+
+    <h2><span data-i18n="sun.title">Sole</span> <span id="sunInfo" class="badge" style="margin-left:auto;font-size:9px"></span></h2>
+    <div class="row"><span data-i18n="sun.place">Luogo</span><select id="place">
+      <option value="45.44,10.99">Verona 45,4°N</option>
+      <option value="41.90,12.50">Roma 41,9°N</option>
+      <option value="45.46,9.19">Milano 45,5°N</option>
+      <option value="37.50,15.09">Catania 37,5°N</option>
+      <option value="0,0" data-i18n="sun.custom">personalizzato</option>
+    </select></div>
+    <div class="row"><span data-i18n="sun.north">Nord ↺</span><input type="range" id="north" min="0" max="359" step="1" value="0"><b id="northv" style="width:38px;text-align:right;font:11px var(--mono);color:var(--dim)"></b></div>
+    <div class="row"><button id="bNorth0" style="flex:1" data-i18n="sun.reset" data-i18n-title="sun.reset.t" title="allinea il nord all'asse -Z">Azzera</button><button id="bNorth90" style="flex:1" data-i18n="sun.plus90">+90°</button></div>
+    <div class="row" id="rowLat" style="display:none"><span data-i18n="sun.latlon">Lat / Lon</span>
+      <input type="number" id="lat" step="0.1" min="-90" max="90"><input type="number" id="lon" step="0.1" min="-180" max="180"></div>
+    <div class="row"><span data-i18n="sun.date">Data</span><input type="range" id="doy" min="1" max="365" step="1" value="172"><b id="doyv" style="width:52px;text-align:right;font:11px var(--mono);color:var(--dim)"></b></div>
+    <div class="row"><span data-i18n="sun.hour">Ora</span><input type="range" id="hour" min="0" max="24" step="0.25" value="11"></div>
+    <div class="row"><span data-i18n="sun.modelRot">Ruota FBX</span><input type="range" id="mrot" min="0" max="359" step="1" value="0"><b id="mrotv" style="width:38px;text-align:right;font:11px var(--mono);color:var(--dim)">0°</b></div>
+
+    <h2><span data-i18n="rend.title">Resa</span></h2>
+    <div class="row"><span data-i18n="rend.speed">Velocità</span><input type="range" id="nav" min="0.5" max="30" step="0.5" value="15"><b id="navv" style="width:52px;text-align:right;font:11px var(--mono);color:var(--dim)"></b></div>
+    <div class="row"><span data-i18n="rend.expo">Esposizione</span><input type="range" id="expo" min="0.2" max="3" step="0.05" value="1"></div>
+    <div class="row"><span data-i18n="rend.ambient">Ambiente</span><input type="range" id="envI" min="0" max="3" step="0.05" value="1"></div>
+    <div class="row"><label style="display:flex;gap:6px;align-items:center;color:var(--dim);font-size:11px"><input type="checkbox" id="cShadow" checked style="width:auto"><span data-i18n="rend.shadows">ombre</span></label>
+      <label style="display:flex;gap:6px;align-items:center;color:var(--dim);font-size:11px"><input type="checkbox" id="cGrid" checked style="width:auto"><span data-i18n="rend.grid">griglia</span></label>
+      <label style="display:flex;gap:6px;align-items:center;color:var(--dim);font-size:11px"><input type="checkbox" id="cSky" checked style="width:auto"><span data-i18n="rend.sky">cielo</span></label></div>
+    <div class="hint" data-i18n-html="rend.help">WASD = muovi verso dove guardi · Q/E = scendi/sali (velocità nel pannello Resa)<br>
+    Tasto destro = ruota la visuale sul posto · sinistro trascinato = pan · rotella = zoom<br>
+    Click sinistro = seleziona · Shift+click = aggiungi · Doppio click = zoom sulla prop<br>
+    H = nascondi · I = isola · U = mostra tutto · M = materiali · T = texture · Invio = applica</div>
+  </aside>
+</div>
+<div id="mpicker" class="ovl">
+  <div class="ovlbox">
+    <div class="ovlhead">
+      <b style="font:600 11px var(--mono);letter-spacing:.1em" data-i18n="mp.title">LIBRERIA MATERIALI</b>
+      <input type="text" id="mfilter" data-i18n-ph="mp.filter.ph" placeholder="filtra per nome…" autocomplete="off">
+      <span id="mcnt" class="badge"></span>
+      <button id="bNewMat" class="pri" data-i18n="mp.new">Nuovo</button>
+      <button id="bDupMat" data-i18n="mp.dup">Duplica</button>
+      <button id="bDelMat" data-i18n="mp.del">Elimina</button>
+      <button id="mpClose" data-i18n="mp.close">Chiudi</button>
+    </div>
+    <div id="matlist"></div>
+  </div>
+</div>
+<div id="picker" class="ovl">
+  <div id="pkbox">
+    <div id="pkhead">
+      <input type="text" id="pkq" data-i18n-ph="tp.filter.ph" placeholder="filtra per nome…" autocomplete="off">
+      <span id="pkcnt" class="badge"></span>
+      <button id="pkAdd" data-i18n="tp.add">Aggiungi file</button>
+      <button id="pkClose" data-i18n="tp.close">Chiudi</button>
+    </div>
+    <div id="pkgrid"></div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+}}
+</script>
+<script type="module" src="app.js"></script>
+</body>
+</html>

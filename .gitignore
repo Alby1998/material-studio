@@ -1,0 +1,24 @@
+# Dati di progetto reali (derivati da modelli cliente) — non ridistribuibili
+*.materials.json
+*.fbx
+*.glb
+*.gltf
+*.obj
+*.3ds
+*.hdr
+
+# Eccezione: il modello demo di esempio, se presente
+!demo/*.glb
+
+# Backup locali
+*.bak
+*.zip
+
+# Istruzioni agente / config editor locale
+CLAUDE.md
+PROGETTO.md
+.claude/
+
+# Sistema
+.DS_Store
+Thumbs.db
