@@ -679,7 +679,7 @@ function syncReadouts(){
   if(document.activeElement!==E('mColor')) E('mColor').value=d.color;
 }
 const bind=(el,fn)=>E(el).addEventListener('input',()=>{const d=P.materials[curMat];if(!d)return;fn(d);syncReadouts();markPending();});
-bind('mName',d=>d.name=E('mName').value);
+bind('mName',d=>{ d.name=E('mName').value; delete d.i18nKey; });   // nome scelto dall'utente: non va piu' ritradotto
 bind('mColor',d=>d.color=E('mColor').value);
 bind('mHex',d=>{const v=E('mHex').value.trim();if(/^#[0-9a-f]{6}$/i.test(v))d.color=v;});
 bind('mMetal',d=>d.metalness=+E('mMetal').value);
@@ -1001,7 +1001,9 @@ const DEMO_MATS=[
 function assignDemoMaterials(){
   DEMO_MATS.forEach(([key,prefixes,color,metalness,roughness,opacity])=>{
     const id=uid('m_');
-    P.materials[id]={name:T(key),color,metalness,roughness,opacity,
+    /* i18nKey: il nome resta ritraducibile al cambio lingua (vedi relabelDemo()).
+       Viene rimossa appena l'utente rinomina il materiale a mano. */
+    P.materials[id]={name:T(key),i18nKey:key,color,metalness,roughness,opacity,
                      ru:1,rv:1,normalScale:1,maps:{}};
     meshes.forEach(o=>{
       const n=o.name||'';
@@ -1016,7 +1018,7 @@ function loadDemoScene(){
   assignDemoMaterials();
   /* una sezione gia' pronta: il brief .md e' la parte che distingue il tool,
      ma richiede una selezione — cosi' e' esportabile al primo click. */
-  P.sections=[{name:T('demo.section'),keys:meshes.map(o=>o.userData.key)}];
+  P.sections=[{name:T('demo.section'),i18nKey:'demo.section',keys:meshes.map(o=>o.userData.key)}];
   refreshUI(); buildEditor(); buildTree(); buildSecList(); updateApplyBtn();
   toast(T('msg.demoLoaded'));
 }
@@ -1296,8 +1298,18 @@ updateEnv();
 
 /* ---------- selettore lingua ---------- */
 /* ridisegna tutto cio' che contiene testo: markup statico + liste costruite a runtime */
+/* I nomi generati dal codice (materiali e sezione della scena demo) sono stringhe
+   gia' risolte: senza questo restano nella lingua in cui e' partita l'app. Ritraduco
+   solo chi porta ancora i18nKey — un nome rinominato dall'utente l'ha perso e resta suo. */
+function relabelDemo(){
+  for(const id in P.materials){
+    const d=P.materials[id]; if(d.i18nKey) d.name=T(d.i18nKey);
+  }
+  P.sections.forEach(sec=>{ if(sec.i18nKey) sec.name=T(sec.i18nKey); });
+}
 function applyLang(){
   applyI18n();
+  relabelDemo();
   E('navv').textContent=navBase.toFixed(1)+' m/s';
   E('doyv').textContent=doyToDate(+E('doy').value).label;
   if(hudInfo) E('hud').textContent=T('hud',hudInfo);
